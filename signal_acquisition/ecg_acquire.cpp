@@ -3,7 +3,6 @@
 // put features into classification model
 
 #include <iostream>
-#include <string> 
 #include <vector>
 #include "/usr/local/include/wfdb/wfdb.h" 
 using namespace std;
@@ -17,20 +16,25 @@ WFDB_Siginfo*  load_ecg_metaset(){
         cout << "Failed to open signal" << endl;
         return nullptr;
     }
-    else{
-        WFDB_Siginfo *meta_data_array = new WFDB_Siginfo[nsig];
-        isigopen("ECGMRI3T01Ff", meta_data_array, nsig);
-    }
+    WFDB_Siginfo *meta_data_array = new WFDB_Siginfo[nsig];
+    isigopen("ECGMRI3T01Ff", meta_data_array, nsig);
+    return meta_data_array;
 }
 
 vector<vector<int>> get_ecg_raw_data(int nsig){
-    vector<vector<int>> ecg_data[nsig];
+    vector<vector<int>> ecg_data(nsig);
 
     WFDB_Sample *raw_sample = new WFDB_Sample[nsig];
 
     //use getvec to load data from .dat file into raw_sample
-    // load data from raw_sample into ecg_data pushback
+    while(getvec(raw_sample) > 0){
+        for(int i = 0; i < nsig; i++){
+            ecg_data[i].push_back(static_cast<int>(raw_sample[i]));
+        }
+    }
 
+    delete[] raw_sample;
+    return ecg_data;
 }
 
 
