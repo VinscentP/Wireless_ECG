@@ -1,28 +1,36 @@
 #include <vector>
-#include <cmath>       
+#include <cmath>
+#include "ecg_filters.h"
 using namespace std;
 
-vector<double> raw_ecg; 
+// Notch Filter using a biquad (Direct Form II) implementation
+// H(z) = (1 - 2cos(ω₀)z⁻¹ + z⁻²) / (1 - 2r·cos(ω₀)z⁻¹ + r²z⁻²)
+vector<double> notch_filter(const vector<double>& raw_ecg, double f_notch, double f_sample){
+    const double pi = 3.14159265358979323846;
+    const double r = 0.995; // closer to 1.0 -> narrower notch
+    const double omega_0 = 2.0 * pi * f_notch / f_sample;
+    const double cos_omega_0 = cos(omega_0);
+    const double b0 = 1.0;
+    const double b1 = -2.0 * cos_omega_0;
+    const double b2 = 1.0;
+    const double a1 = -2.0 * r * cos_omega_0;
+    const double a2 = r * r;
 
-//Notch Filter
-vector<double> notch_filter(vector<double> raw_ecg, double f_notch, double f_sample){
-    vector<double> filtered_ecg;
-    //H(z) = (1 - 2cos(ω₀)z⁻¹ + z⁻²) / (1 - 2r·cos(ω₀)z⁻¹ + r²z⁻²)
-    double omega_0 = 2 * M_PI * f_notch / f_sample; //angular frequency 
-    double r = 0.995; //rolloff factor, closer to 1 -> sharper transition band
-    double cos_omega_0 = cos(omega_0);
-    
-    // b0, b1, b2, a0, a1, a2 are the coefficients of the difference equation
-    double b0, b2, a0 = 1;
-    double b1 = -2 * cos_omega_0;
-    double a1 = 2 * r * cos_omega_0;
-    double a2 = r * r;
+    vector<double> filtered_ecg(raw_ecg.size(), 0.0);
 
-    //apply filter using difference equation and return y[n] wbich is the filtered signal
-    for(int n = 0; n < raw_ecg.size(); n++){
-        filtered_ecg[n] = (b0 * raw_ecg[n] + b1 * raw_ecg[n-1] + b2 * raw_ecg[n-2] - a1 * filtered_ecg[n-1] - a2 * filtered_ecg[n-2]) / a0;
+    // Direct Form II state
+    double z1 = 0.0;
+    double z2 = 0.0;
+
+    for (size_t n = 0; n < raw_ecg.size(); ++n) {
+        const double x = raw_ecg[n];
+        const double y = b0 * x + z1;            // output
+        const double z1_next = b1 * x - a1 * y + z2; // update state 1
+        const double z2_next = b2 * x - a2 * y;      // update state 2
+        filtered_ecg[n] = y;
+        z1 = z1_next;
+        z2 = z2_next;
     }
 
-    //apply filter using difference equation and return y[n] wbich is the filtered signal
     return filtered_ecg;
 }
