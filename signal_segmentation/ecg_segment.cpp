@@ -48,29 +48,29 @@ vector<double> ht_moving_average(const vector<double>& squared_ecg, int window_s
 }
 
 //Adaptive Threshold and Peak Detection stage of HT algorithm
-vector<int> ht_adaptive_threshold(const vector<double>& averaged_ecg, double threshold_factor, int sampling_rate){
+vector<double> ht_adaptive_threshold(const vector<double>& averaged_ecg, double threshold_factor, int sampling_rate){
     double SPKI, NPKI;
     double noise_threshold, peak_threshold;
-    vector<int> r_peak_times;
+    vector<double> r_peak_times;
     
     int init_segment_length = max(1, (int)(averaged_ecg.size() * 0.05));
     vector<double> init_segment(averaged_ecg.begin(), averaged_ecg.begin() + init_segment_length);
-    double max_peak = *max_element(init_segment.begin(), init_segment.end());
+    double PEAKI = *max_element(init_segment.begin(), init_segment.end());
 
-    SPKI = 0.125 * max_peak;
-    NPKI = 0.125 * max_peak;
+    SPKI = 0.125 * PEAKI;
+    NPKI = 0.125 * PEAKI;
 
     peak_threshold = NPKI + threshold_factor * (SPKI - NPKI);
     noise_threshold = 0.5 * peak_threshold;
 
-    int refractory_samples = (int)(0.2 * sampling_rate);
-    int last_r_index = -refractory_samples; // initialize negative so first peak can be detected
-    
+    //int refractory_samples = (int)(0.2 * sampling_rate);
+    //int last_r_index = -refractory_samples; // initialize negative so first peak can be detected
+
     for(int i = 0; i < averaged_ecg.size(); i++){
         if(averaged_ecg[i] > peak_threshold){
             r_peak_times.push_back(i / (double)sampling_rate);
             SPKI = 0.125 * averaged_ecg[i] + 0.875 * SPKI;
-            last_r_index = i;
+            //last_r_index = i;
         }
         else if (averaged_ecg[i] > noise_threshold){
             NPKI = 0.125 * averaged_ecg[i] + 0.875 * NPKI;

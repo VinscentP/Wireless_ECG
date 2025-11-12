@@ -23,12 +23,14 @@ int main(){
     vector<vector<double>> differentiated_ecg_data(nsig);
     vector<vector<double>> squared_ecg_data(nsig);
     vector<vector<double>> averaged_ecg_data(nsig);
+    vector<vector<double>> segmentated_ecg_data(nsig);
 
     for (int i = 0; i < nsig; i++) {
         filtered_ecg_data[i] = notch_filter(phys_ecg_data[i], 60, 1000);
         differentiated_ecg_data[i] = ht_differentiation(filtered_ecg_data[i]);
         squared_ecg_data[i] = ht_squaring(differentiated_ecg_data[i]);
         averaged_ecg_data[i] = ht_moving_average(squared_ecg_data[i], 35);
+        segmentated_ecg_data[i] = ht_adaptive_threshold(averaged_ecg_data[i], 0.25, 1250);
     }
 
     return 0;
