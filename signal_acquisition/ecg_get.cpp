@@ -2,7 +2,6 @@
 //adaptive sampling -> filter noise -> segment signals -> convert segment to numerical values
 // put features into classification model
 
-#include <iostream>
 #include <vector>
 #include "/usr/local/include/wfdb/wfdb.h" 
 #include "ecg_get.h"
@@ -10,8 +9,7 @@
 using namespace std;
 
 //load PhysioNet ECG dataset
-WFDB_Siginfo*  load_ecg_metaset(int nsig){ 
-    setwfdb("/Users/vincentpham/Desktop/Senior_Capstone/data");
+/*WFDB_Siginfo*  load_ecg_metaset(int nsig){ 
     
     //int nsig = isigopen("ECGMRI3T01Ff", NULL, 0);
     if (nsig < 1){
@@ -22,7 +20,7 @@ WFDB_Siginfo*  load_ecg_metaset(int nsig){
     isigopen("ECGMRI3T01Ff", meta_data_array, nsig);
     return meta_data_array;
 }
-
+*/
 vector<vector<int>> get_ecg_raw_data(int nsig){
     vector<vector<int>> ecg_data(nsig);
     WFDB_Sample *raw_sample = new WFDB_Sample[nsig];

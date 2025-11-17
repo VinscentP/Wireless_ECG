@@ -8,6 +8,6 @@
 using namespace std;
 
 
-void export_to_csv(const vector<vector<double>>& physical_ecg_data, int nsig);
+void export_to_csv(const vector<vector<double>>& physical_ecg_data, int nsig, const string& filename);
 
 #endif

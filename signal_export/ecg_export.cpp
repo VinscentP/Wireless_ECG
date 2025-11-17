@@ -4,8 +4,8 @@
 
 using namespace std;
 
-void export_to_csv(const vector<vector<double>>& physical_ecg_data, int nsig){
-    ofstream ecg_csv_file("ecg_signal.csv");
+void export_to_csv(const vector<vector<double>>& physical_ecg_data, int nsig, const string& filename){
+    ofstream ecg_csv_file(filename);
 
     if(!ecg_csv_file.is_open()){
         cout << "Error opening csv file." << endl;
