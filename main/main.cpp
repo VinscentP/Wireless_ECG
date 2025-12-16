@@ -2,7 +2,7 @@
 #include <vector>
 #include "/usr/local/include/wfdb/wfdb.h" 
 #include "/Users/vincentpham/Desktop/Senior_Capstone/signal_acquisition/ecg_get.h"
-#include "/Users/vincentpham/Desktop/Senior_Capstone/signal_acquisition/ecg_filters.h"
+#include "/Users/vincentpham/Desktop/Senior_Capstone/signal_process/ecg_filters.h"
 #include "/Users/vincentpham/Desktop/Senior_Capstone/signal_process/ecg_ht.h"
 #include "/Users/vincentpham/Desktop/Senior_Capstone/signal_export/ecg_export.h"
 
