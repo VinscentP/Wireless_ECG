@@ -5,7 +5,7 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
-#include "ecg_segment.h"
+#include "ecg_ht.h"
 using namespace std;
 
 //Differentiation stage of HT algorithm
@@ -63,14 +63,14 @@ vector<double> ht_adaptive_threshold(const vector<double>& averaged_ecg, double 
     peak_threshold = NPKI + threshold_factor * (SPKI - NPKI);
     noise_threshold = 0.5 * peak_threshold;
 
-    //int refractory_samples = (int)(0.2 * sampling_rate);
-    //int last_r_index = -refractory_samples; // initialize negative so first peak can be detected
+    int minimum_samples = (int)(0.2 * sampling_rate);
+    int last_r_index = -minimum_samples; // initialize negative so first peak can be detected
 
     for(int i = 0; i < averaged_ecg.size(); i++){
         if(averaged_ecg[i] > peak_threshold){
             r_peak_times.push_back(i / (double)sampling_rate);
             SPKI = 0.125 * averaged_ecg[i] + 0.875 * SPKI;
-            //last_r_index = i;
+            last_r_index = i;
         }
         else if (averaged_ecg[i] > noise_threshold){
             NPKI = 0.125 * averaged_ecg[i] + 0.875 * NPKI;

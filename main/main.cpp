@@ -3,7 +3,7 @@
 #include "/usr/local/include/wfdb/wfdb.h" 
 #include "/Users/vincentpham/Desktop/Senior_Capstone/signal_acquisition/ecg_get.h"
 #include "/Users/vincentpham/Desktop/Senior_Capstone/signal_acquisition/ecg_filters.h"
-#include "/Users/vincentpham/Desktop/Senior_Capstone/signal_segmentation/ecg_segment.h"
+#include "/Users/vincentpham/Desktop/Senior_Capstone/signal_process/ecg_ht.h"
 #include "/Users/vincentpham/Desktop/Senior_Capstone/signal_export/ecg_export.h"
 
 using namespace std;
@@ -32,7 +32,7 @@ int main(){
     vector<vector<double>> segmentated_ecg_data(nsig);
 
     for (int i = 0; i < nsig; i++) {
-        //filtered_ecg_data[i] = notch_filter(phys_ecg_data[i], 60, 1024);
+        filtered_ecg_data[i] = bandpass_filter(phys_ecg_data[i], 60, 120, 1024);
         differentiated_ecg_data[i] = ht_differentiation(phys_ecg_data[i]);
         squared_ecg_data[i] = ht_squaring(differentiated_ecg_data[i]);
         averaged_ecg_data[i] = ht_moving_average(squared_ecg_data[i], 35);

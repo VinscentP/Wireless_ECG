@@ -1,5 +1,5 @@
-#ifndef ECG_SEGMENT_H
-#define ECG_SEGMENT_H
+#ifndef ECG_HT_H
+#define ECG_HT_H
 
 #include <vector>
 #include <cmath>
