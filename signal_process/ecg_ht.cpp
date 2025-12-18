@@ -51,7 +51,7 @@ vector<double> ht_moving_average(const vector<double>& squared_ecg, int window_s
 vector<double> ht_adaptive_threshold(const vector<double>& averaged_ecg, double threshold_factor, int sampling_rate){
     double SPKI, NPKI;
     double noise_threshold, peak_threshold;
-    vector<double> r_peak_times;
+    vector<double> r_peak_indices;
     
     int init_segment_length = max(1, (int)(averaged_ecg.size() * 0.05));
     vector<double> init_segment(averaged_ecg.begin(), averaged_ecg.begin() + init_segment_length);
@@ -68,7 +68,7 @@ vector<double> ht_adaptive_threshold(const vector<double>& averaged_ecg, double 
 
     for(int i = 0; i < averaged_ecg.size(); i++){
         if(averaged_ecg[i] > peak_threshold){
-            r_peak_times.push_back(i / (double)sampling_rate);
+            r_peak_indices.push_back(i );
             SPKI = 0.125 * averaged_ecg[i] + 0.875 * SPKI;
             last_r_index = i;
         }
@@ -78,5 +78,5 @@ vector<double> ht_adaptive_threshold(const vector<double>& averaged_ecg, double 
         peak_threshold = NPKI + threshold_factor * (SPKI - NPKI);
         noise_threshold = 0.5 * peak_threshold;
     }
-    return r_peak_times;
+    return r_peak_indices;
 }

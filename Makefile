@@ -9,8 +9,8 @@ CXXFLAGS = -std=c++11 -I/usr/local/include/wfdb
 SRCS = \
     main/main.cpp \
     signal_acquisition/ecg_get.cpp \
-    signal_acquisition/ecg_filters.cpp \
-    signal_segmentation/ecg_segment.cpp \
+    signal_process/ecg_filters.cpp \
+    signal_process/ecg_ht.cpp \
 	signal_export/ecg_export.cpp
 
 # Build rule: compile and link everything
