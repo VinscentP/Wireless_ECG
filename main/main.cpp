@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const int sampling_rate = 1250;
+const int sampling_freq = 1250;
 
 int main(){
     setwfdb("/Users/vincentpham/Desktop/Senior_Capstone/data");
@@ -34,12 +34,17 @@ int main(){
     vector<vector<double>> segmentated_ecg_data(nsig);
 
     for (int i = 0; i < nsig; i++) {
-        filtered_ecg_data[i] = bandpass_filter(phys_ecg_data[i], 60, 120, sampling_rate);
-        differentiated_ecg_data[i] = ht_differentiation(filtered_ecg_data[i]);
+        filtered_ecg_data[i] = bandpass_filter(phys_ecg_data[i], 5, 25, sampling_freq);
+        differentiated_ecg_data[i] = ht_differentiation(filtered_ecg_data[i], sampling_freq);
         squared_ecg_data[i] = ht_squaring(differentiated_ecg_data[i]);
         averaged_ecg_data[i] = ht_moving_average(squared_ecg_data[i], 35);
-        segmentated_ecg_data[i] = ht_adaptive_threshold(averaged_ecg_data[i], 0.25, sampling_rate);
+        segmentated_ecg_data[i] = ht_adaptive_threshold(averaged_ecg_data[i], 0.1, sampling_freq);
     }
+    export_to_csv(phys_ecg_data, nsig, "ecg_phys.csv" );
+    export_to_csv(filtered_ecg_data, nsig, "ecg_filtered.csv" );
+    export_to_csv(differentiated_ecg_data, nsig, "ecg_differentiated.csv" );
+    export_to_csv(squared_ecg_data, nsig, "ecg_squared.csv" );
+    export_to_csv(averaged_ecg_data, nsig, "ecg_average.csv");
     export_to_csv(segmentated_ecg_data, nsig, "ecg_peak.csv");
     return 0;
 }

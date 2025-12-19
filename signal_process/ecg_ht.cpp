@@ -3,17 +3,17 @@
 //Highpass filter -> Lowpass filter -> Differentiation -> Squaring -> Moving Average -> Adaptive Threshold -> R-peak detection
 
 #include <vector>
-#include <cmath>
 #include <algorithm>
 #include "ecg_ht.h"
 using namespace std;
 
 //Differentiation stage of HT algorithm
-vector<double> ht_differentiation(const vector<double>& phys_ecg_data){
+vector<double> ht_differentiation(const vector<double>& phys_ecg_data, int sampling_freq){
     vector<double> differentiated_ecg;
     //differentiate the ecg data using the difference equation
     for(int i = 1; i < phys_ecg_data.size(); i++){
-        differentiated_ecg.push_back(phys_ecg_data[i] - phys_ecg_data[i-1]);
+        double derivative = (phys_ecg_data[i] - phys_ecg_data[i-1]) * sampling_freq;
+        differentiated_ecg.push_back(derivative);
     }
     return differentiated_ecg;
 }
@@ -23,7 +23,7 @@ vector<double> ht_squaring(const vector<double>& differentiated_ecg){
     vector<double> squared_ecg;
     
     for(int i = 0; i < differentiated_ecg.size(); i++){
-        squared_ecg.push_back(pow(differentiated_ecg[i], 2));  
+        squared_ecg.push_back(differentiated_ecg[i] * differentiated_ecg[i]);  
     }
     return squared_ecg;
 }
@@ -67,10 +67,10 @@ vector<double> ht_adaptive_threshold(const vector<double>& averaged_ecg, double 
     int last_r_index = -minimum_samples; // initialize negative so first peak can be detected
 
     for(int i = 0; i < averaged_ecg.size(); i++){
-        if(averaged_ecg[i] > peak_threshold){
+        if(averaged_ecg[i] > peak_threshold && i - last_r_index >= minimum_samples){
             r_peak_indices.push_back(i );
-            SPKI = 0.125 * averaged_ecg[i] + 0.875 * SPKI;
             last_r_index = i;
+            SPKI = 0.125 * averaged_ecg[i] + 0.875 * SPKI;
         }
         else if (averaged_ecg[i] > noise_threshold){
             NPKI = 0.125 * averaged_ecg[i] + 0.875 * NPKI;
