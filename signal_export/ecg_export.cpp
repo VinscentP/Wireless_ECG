@@ -4,28 +4,38 @@
 
 using namespace std;
 
-void export_to_csv(const vector<vector<double>>& physical_ecg_data, int nsig, const string& filename){
+void export_to_csv(const vector<vector<double>>& data, int nsig, const string& filename) {
     ofstream ecg_csv_file(filename);
-
-    if(!ecg_csv_file.is_open()){
-        cout << "Error opening csv file." << endl;
+    if (!ecg_csv_file.is_open()) {
+        cout << "Error opening CSV file." << endl;
+        return;
     }
-    else{
-        ecg_csv_file << "Lead1,Lead2,Lead3\n";
 
-        int num_samples = physical_ecg_data[0].size();
+    // Write header
+    for (int j = 0; j < nsig; j++) {
+        ecg_csv_file << "Lead" << (j + 1);
+        if (j < nsig - 1) ecg_csv_file << ",";
+    }
+    ecg_csv_file << "\n";
 
-        for(int i = 0; i < num_samples; i++){
-            for(int j = 0; j < nsig; j++){
-                ecg_csv_file << physical_ecg_data[j][i];
-                if(j < nsig - 1){
-                    ecg_csv_file << ",";
-                }
-            }
-            ecg_csv_file << "\n";
+    // Find the maximum number of samples/peaks across all leads
+    size_t max_size = 0;
+    for (int j = 0; j < nsig; j++) {
+        if (data[j].size() > max_size)
+            max_size = data[j].size();
+    }
+
+    // Write data row by row
+    for (size_t i = 0; i < max_size; i++) {
+        for (int j = 0; j < nsig; j++) {
+            if (i < data[j].size())
+                ecg_csv_file << data[j][i];  // write value if exists
+            // else leave blank if this lead has fewer values
+            if (j < nsig - 1) ecg_csv_file << ",";
         }
-
-        ecg_csv_file.close();
-        cout << "Data export complete." << endl;
+        ecg_csv_file << "\n";
     }
+
+    ecg_csv_file.close();
+    cout << "Data export complete." << endl;
 }

@@ -48,14 +48,18 @@ vector<double> ht_moving_average(const vector<double>& squared_ecg, int window_s
 }
 
 //Adaptive Threshold and Peak Detection stage of HT algorithm
-vector<double> ht_adaptive_threshold(const vector<double>& averaged_ecg, double threshold_factor, int sampling_rate){
+vector<double> ht_adaptive_threshold(const vector<double>& averaged_ecg, double threshold_factor, int sampling_rate) {
     double SPKI, NPKI;
-    double noise_threshold, peak_threshold;
+    double peak_threshold, noise_threshold;
     vector<double> r_peak_indices;
-    
-    int init_segment_length = max(1, (int)(averaged_ecg.size() * 0.05));
-    vector<double> init_segment(averaged_ecg.begin(), averaged_ecg.begin() + init_segment_length);
-    double PEAKI = *max_element(init_segment.begin(), init_segment.end());
+    // Initialize
+    /*int init_segment_length = max(1, (int)(averaged_ecg.size() * 0.05));
+    double PEAKI = *max_element(averaged_ecg.begin(), averaged_ecg.begin() + init_segment_length);
+    */
+
+    int start_index = 70; // skip samples
+    int init_segment_length = max(1, (int)((averaged_ecg.size() - start_index) * 0.05));
+    double PEAKI = *max_element(averaged_ecg.begin() + start_index, averaged_ecg.begin() + start_index + init_segment_length);
 
     SPKI = 0.125 * PEAKI;
     NPKI = 0.125 * PEAKI;
@@ -64,19 +68,27 @@ vector<double> ht_adaptive_threshold(const vector<double>& averaged_ecg, double 
     noise_threshold = 0.5 * peak_threshold;
 
     int minimum_samples = (int)(0.2 * sampling_rate);
-    int last_r_index = -minimum_samples; // initialize negative so first peak can be detected
+    int last_r_index = -minimum_samples;
 
-    for(int i = 0; i < averaged_ecg.size(); i++){
-        if(averaged_ecg[i] > peak_threshold && i - last_r_index >= minimum_samples){
-            r_peak_indices.push_back(i );
-            last_r_index = i;
-            SPKI = 0.125 * averaged_ecg[i] + 0.875 * SPKI;
+    for (int i = start_index; i < averaged_ecg.size() - 1; i++) { 
+        double current_val = averaged_ecg[i];
+
+        // Simple local max check
+        if (current_val > averaged_ecg[i - 1] && current_val > averaged_ecg[i + 1]) {
+            if (current_val > peak_threshold && (i - last_r_index) >= minimum_samples) {
+                // QRS detected
+                r_peak_indices.push_back(i);
+                SPKI = 0.125 * current_val + 0.875 * SPKI;
+                last_r_index = i;
+            } else {
+                // Noise
+                NPKI = 0.125 * current_val + 0.875 * NPKI;
+            }
+
+            // Update thresholds
+            peak_threshold = NPKI + threshold_factor * (SPKI - NPKI);
+            noise_threshold = 0.5 * peak_threshold;
         }
-        else if (averaged_ecg[i] > noise_threshold){
-            NPKI = 0.125 * averaged_ecg[i] + 0.875 * NPKI;
-        }
-        peak_threshold = NPKI + threshold_factor * (SPKI - NPKI);
-        noise_threshold = 0.5 * peak_threshold;
     }
     return r_peak_indices;
 }

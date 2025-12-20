@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const int sampling_freq = 1250;
+const int sampling_freq = 250;
 
 int main(){
     setwfdb("/Users/vincentpham/Desktop/Senior_Capstone/data");
@@ -37,9 +37,10 @@ int main(){
         filtered_ecg_data[i] = bandpass_filter(phys_ecg_data[i], 5, 25, sampling_freq);
         differentiated_ecg_data[i] = ht_differentiation(filtered_ecg_data[i], sampling_freq);
         squared_ecg_data[i] = ht_squaring(differentiated_ecg_data[i]);
-        averaged_ecg_data[i] = ht_moving_average(squared_ecg_data[i], 35);
-        segmentated_ecg_data[i] = ht_adaptive_threshold(averaged_ecg_data[i], 0.1, sampling_freq);
+        averaged_ecg_data[i] = ht_moving_average(squared_ecg_data[i], 37);
+        segmentated_ecg_data[i] = ht_adaptive_threshold(averaged_ecg_data[i], 0.9, sampling_freq);
     }
+
     export_to_csv(phys_ecg_data, nsig, "ecg_phys.csv" );
     export_to_csv(filtered_ecg_data, nsig, "ecg_filtered.csv" );
     export_to_csv(differentiated_ecg_data, nsig, "ecg_differentiated.csv" );
