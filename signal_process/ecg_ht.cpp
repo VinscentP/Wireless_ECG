@@ -1,5 +1,4 @@
-//Segmentation
-//Uses Hamiltion and Tomkins algoirthm
+// Hamiltion and Tomkins algoirthm
 //Highpass filter -> Lowpass filter -> Differentiation -> Squaring -> Moving Average -> Adaptive Threshold -> R-peak detection
 
 #include <vector>
@@ -7,7 +6,7 @@
 #include "ecg_ht.h"
 using namespace std;
 
-//Differentiation stage of HT algorithm
+//Differentiation stage 
 vector<double> ht_differentiation(const vector<double>& phys_ecg_data, int sampling_freq){
     vector<double> differentiated_ecg;
     //differentiate the ecg data using the difference equation
@@ -18,7 +17,7 @@ vector<double> ht_differentiation(const vector<double>& phys_ecg_data, int sampl
     return differentiated_ecg;
 }
 
-//Squaring stage of HT algorithm
+//Squaring stage 
 vector<double> ht_squaring(const vector<double>& differentiated_ecg){
     vector<double> squared_ecg;
     
@@ -28,7 +27,7 @@ vector<double> ht_squaring(const vector<double>& differentiated_ecg){
     return squared_ecg;
 }
 
-//Moving Average stage of HT algorithm
+//Moving Average stage 
 vector<double> ht_moving_average(const vector<double>& squared_ecg, int window_size){
     double sum = 0.0;
     vector<double> averaged_ecg;
@@ -43,15 +42,15 @@ vector<double> ht_moving_average(const vector<double>& squared_ecg, int window_s
         int actual_window = min(j + 1, window_size);
         averaged_ecg.push_back(sum / actual_window);
     }
-    
+   
     return averaged_ecg;
 }
 
-//Adaptive Threshold and Peak Detection stage of HT algorithm
+//Adaptive Threshold stage 
 vector<double> ht_adaptive_threshold(const vector<double>& averaged_ecg, double threshold_factor, int sampling_rate) {
     double SPKI, NPKI;
     double peak_threshold, noise_threshold;
-    vector<double> r_peak_indices;
+    vector<double> approx_indices;
     // Initialize
     /*int init_segment_length = max(1, (int)(averaged_ecg.size() * 0.05));
     double PEAKI = *max_element(averaged_ecg.begin(), averaged_ecg.begin() + init_segment_length);
@@ -77,7 +76,7 @@ vector<double> ht_adaptive_threshold(const vector<double>& averaged_ecg, double 
         if (current_val > averaged_ecg[i - 1] && current_val > averaged_ecg[i + 1]) {
             if (current_val > peak_threshold && (i - last_r_index) >= minimum_samples) {
                 // QRS detected
-                r_peak_indices.push_back(i);
+                approx_indices.push_back(i);
                 SPKI = 0.125 * current_val + 0.875 * SPKI;
                 last_r_index = i;
             } else {
@@ -90,5 +89,30 @@ vector<double> ht_adaptive_threshold(const vector<double>& averaged_ecg, double 
             noise_threshold = 0.5 * peak_threshold;
         }
     }
+    return approx_indices;
+}
+
+//R Peak detection stage 
+vector<double> ht_peak_detection(const vector<double>& threshold_ecg, const vector<double>& filtered_ecg, int window_size){
+    vector<double> r_peak_indices;
+    
+    for(int i = 0; i < threshold_ecg.size(); i++){
+        int approx_index = (int)threshold_ecg[i];
+        int start = max(0, approx_index - window_size);
+        int end = min((int)filtered_ecg.size() - 1, approx_index + window_size);
+
+        int best_index = approx_index;
+        double best_val = filtered_ecg[approx_index];
+
+        for(int j = start; j <= end; j++){
+            double val = filtered_ecg[j];
+            if(val > best_val){
+                best_val = val;
+                best_index = j;
+            }
+        }
+        r_peak_indices.push_back(best_index);
+    }
+
     return r_peak_indices;
 }

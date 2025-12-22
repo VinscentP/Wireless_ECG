@@ -32,20 +32,24 @@ int main(){
     vector<vector<double>> squared_ecg_data(nsig);
     vector<vector<double>> averaged_ecg_data(nsig);
     vector<vector<double>> segmentated_ecg_data(nsig);
-
+    vector<vector<double>> r_indices(nsig);
     for (int i = 0; i < nsig; i++) {
         filtered_ecg_data[i] = bandpass_filter(phys_ecg_data[i], 5, 25, sampling_freq);
         differentiated_ecg_data[i] = ht_differentiation(filtered_ecg_data[i], sampling_freq);
         squared_ecg_data[i] = ht_squaring(differentiated_ecg_data[i]);
         averaged_ecg_data[i] = ht_moving_average(squared_ecg_data[i], 37);
         segmentated_ecg_data[i] = ht_adaptive_threshold(averaged_ecg_data[i], 0.9, sampling_freq);
+        r_indices[i] = ht_peak_detection(segmentated_ecg_data[i], filtered_ecg_data[i], 15);
     }
 
+    
     export_to_csv(phys_ecg_data, nsig, "ecg_phys.csv" );
     export_to_csv(filtered_ecg_data, nsig, "ecg_filtered.csv" );
     export_to_csv(differentiated_ecg_data, nsig, "ecg_differentiated.csv" );
     export_to_csv(squared_ecg_data, nsig, "ecg_squared.csv" );
     export_to_csv(averaged_ecg_data, nsig, "ecg_average.csv");
-    export_to_csv(segmentated_ecg_data, nsig, "ecg_peak.csv");
+    export_to_csv(segmentated_ecg_data, nsig, "ecg_peak_threshold.csv");
+    export_to_csv(r_indices, nsig, "r_indices.csv");
+
     return 0;
 }
