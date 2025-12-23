@@ -33,7 +33,7 @@ vector<pvc_features> extract_pvc_features (const vector<double>& r_peak_indices,
   30 - 84 samples 
 */
 
-int get_qrs_start (const vector<double>& filtered_ecg, 
+int get_q_index (const vector<double>& filtered_ecg, 
         int sampling_freq, double threshold_voltage, int r_index){
     
     int search_interval_1  = 0.09 * sampling_freq;      //chose 0.09 seconds for duration
