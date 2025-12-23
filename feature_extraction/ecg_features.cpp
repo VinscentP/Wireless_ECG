@@ -52,7 +52,7 @@ int get_q_index (const vector<double>& filtered_ecg,
     int Q2_index = r_index;
     double Q2_val = filtered_ecg[r_index];
 
-    for(int i = r_index; i < search_interval_2; i++){
+    for(int i = max(0, r_index - search_interval_2); i < r_index; i++){
         if(filtered_ecg[i] < Q2_val){
             Q2_val = filtered_ecg[i];
             Q2_index = i;
@@ -74,5 +74,49 @@ int get_q_index (const vector<double>& filtered_ecg,
     }
     else{
         return Q2_index;
+    }
+}
+
+int get_s_index(const vector<double>& filtered_ecg, 
+        int sampling_freq, double threshold_voltage, int r_index){
+    
+    int search_interval_1  = 0.09 * sampling_freq;      //chose 0.09 seconds for duration
+    int search_interval_2 = 3 * search_interval_1;
+    
+    int S1_index = r_index; 
+    double S1_val = filtered_ecg[r_index];
+
+    for(int i = r_index; i <= min((int)filtered_ecg.size() - 1, r_index + search_interval_1); i++){
+      if(filtered_ecg[i] < S1_val){
+        S1_val = filtered_ecg[i];
+        S1_index = i;
+      }
+    }
+
+    int S2_index = r_index;
+    double S2_val = filtered_ecg[r_index];
+
+    for(int i = r_index; i <= min((int)filtered_ecg.size() - 1, r_index + search_interval_2); i++){
+        if(filtered_ecg[i] < S2_val){
+            S2_val = filtered_ecg[i];
+            S2_index = i;
+          }
+    }
+    
+    double MV_ss = 0.0;
+    for(int i = min(S1_index, S2_index); i <= max(S1_index, S2_index); i++){
+        MV_ss = max(MV_ss, abs(filtered_ecg[i]));
+    }
+    if(S1_index == S2_index){
+        return S1_index;
+    }
+    else if (MV_ss > abs(S1_val) + threshold_voltage) {
+        return S2_index;
+    }
+    else if (S2_val > S1_val){
+        return S1_index;
+    }
+    else{
+        return S2_index;
     }
 }

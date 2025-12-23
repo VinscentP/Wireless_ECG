@@ -11,4 +11,5 @@ struct pvc_features {
 
 vector<pvc_features> extract_beat_features(const vector<double>& r_peak_times,const vector<double>& r_amplitudes);
 int get_q_index (const vector<double>& filtered_ecg, int sampling_freq, double threshold_voltage, int r_index);
+
 #endif
