@@ -24,15 +24,15 @@ int main(){
     isigopen(filename, meta_data_array, nsig);
 
     vector<vector<int>> ecg_data = get_ecg_raw_data(nsig);
-    vector<vector<double>> phys_ecg_data = convert_raw_to_phys(ecg_data, meta_data_array, nsig);
+    vector<vector<float>> phys_ecg_data = convert_raw_to_phys(ecg_data, meta_data_array, nsig);
     //export_to_csv(phys_ecg_data, nsig, "ecg_signal.csv");
     // Filter all leads (assuming 60 Hz notch at 1000 Hz sampling rate)
-    vector<vector<double>> filtered_ecg_data(nsig);
-    vector<vector<double>> differentiated_ecg_data(nsig);
-    vector<vector<double>> squared_ecg_data(nsig);
-    vector<vector<double>> averaged_ecg_data(nsig);
-    vector<vector<double>> segmentated_ecg_data(nsig);
-    vector<vector<double>> r_indices(nsig);
+    vector<vector<float>> filtered_ecg_data(nsig);
+    vector<vector<float>> differentiated_ecg_data(nsig);
+    vector<vector<float>> squared_ecg_data(nsig);
+    vector<vector<float>> averaged_ecg_data(nsig);
+    vector<vector<float>> segmentated_ecg_data(nsig);
+    vector<vector<float>> r_indices(nsig);
     for (int i = 0; i < nsig; i++) {
         filtered_ecg_data[i] = bandpass_filter(phys_ecg_data[i], 5, 25, sampling_freq);
         differentiated_ecg_data[i] = ht_differentiation(filtered_ecg_data[i], sampling_freq);

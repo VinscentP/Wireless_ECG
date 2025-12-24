@@ -10,6 +10,6 @@ WFDB_Siginfo*  load_ecg_metaset();
 
 vector<vector<int>> get_ecg_raw_data(int nsig);
 
-vector<vector<double>> convert_raw_to_phys(const vector<vector<int>>& raw_data, WFDB_Siginfo* siginfo, int nsig);
+vector<vector<float>> convert_raw_to_phys(const vector<vector<int>>& raw_data, WFDB_Siginfo* siginfo, int nsig);
 
 #endif

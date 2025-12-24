@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void export_to_csv(const vector<vector<double>>& data, int nsig, const string& filename) {
+void export_to_csv(const vector<vector<float>>& data, int nsig, const string& filename) {
     ofstream ecg_csv_file(filename);
     if (!ecg_csv_file.is_open()) {
         cout << "Error opening CSV file." << endl;

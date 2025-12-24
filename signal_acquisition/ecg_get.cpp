@@ -34,13 +34,13 @@ vector<vector<int>> get_ecg_raw_data(int nsig){
     return ecg_data;
 }
 
-vector<vector<double>> convert_raw_to_phys(const vector<vector<int>>& raw_data, WFDB_Siginfo* siginfo, int nsig){
+vector<vector<float>> convert_raw_to_phys(const vector<vector<int>>& raw_data, WFDB_Siginfo* siginfo, int nsig){
     //physical value = (digital value - baseline) / gain
-    vector<vector<double>> phys_ecg_data(nsig);
+    vector<vector<float>> phys_ecg_data(nsig);
 
     for(int i = 0; i < nsig; i++){
         int baseline = siginfo[i].baseline;
-        double gain = siginfo[i].gain;
+        float gain = siginfo[i].gain;
 
         for(int j = 0; j < raw_data[i].size(); j++){
             int digital = raw_data[i][j];

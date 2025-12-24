@@ -4,7 +4,7 @@
 #include <vector>
 using namespace std;
 
-vector<double> notch_filter(const vector<double>& raw_ecg, double f_notch, double f_sample);
-vector<double> bandpass_filter(const vector<double>& raw_ecg, double f_low, double f_high, double f_sample);
+vector<float> notch_filter(const vector<float>& raw_ecg, float f_notch, float f_sample);
+vector<float> bandpass_filter(const vector<float>& raw_ecg, float f_low, float f_high, float f_sample);
 
 #endif
