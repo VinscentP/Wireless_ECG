@@ -4,7 +4,6 @@
 
 using namespace std;
 
-//Need to get: PR interval, QT interval
 //PR interval = (qrs_start - p_start) / sample rate
 //QRS interval = (qrs_end - qrs_start) / sample rate
 //QT interval = (t_end - qrs_start) / sample rate
@@ -106,12 +105,6 @@ int get_s_index(const vector<float>& filtered_ecg,
     }
 }
 
-int get_p_index(){
-    
-}
-int get_t_index(){
-
-}
 float get_qrs_interval(int q_index, int s_index, int sampling_freq){
     return (s_index - q_index) / sampling_freq;
 }
@@ -126,12 +119,13 @@ vector<pvc_features> extract_pvc_features (const vector<float>& r_peak_indices,
     vector<pvc_features> feature_vector;
 
     for(int i = 1; i + 1 < r_peak_indices.size(); i++){
+        int r_index = (int)r_peak_indices[i];
         pvc_features bf;
         bf.pre_rr  = (r_peak_indices[i] - r_peak_indices[i - 1]) / (float)sampling_freq;
         bf.post_rr = (r_peak_indices[i + 1] - r_peak_indices[i]) / (float)sampling_freq;
         bf.r_amp   = filtered_ecg_data[r_peak_indices[i]];
-        bf.qrs_interval = get_qrs_interval(get_q_index(filtered_ecg_data, sampling_freq, 0.18, i),
-                                        get_s_index(filtered_ecg_data, sampling_freq, 0.18, i),
+        bf.qrs_interval = get_qrs_interval(get_q_index(filtered_ecg_data, sampling_freq, 0.18, r_index),
+                                        get_s_index(filtered_ecg_data, sampling_freq, 0.18, r_index),
                                         sampling_freq);
         bf.qrs_area = get_qrs_area(bf.qrs_interval, bf.r_amp);
         feature_vector.push_back(bf);
