@@ -106,7 +106,7 @@ int get_s_index(const vector<float>& filtered_ecg,
 }
 
 float get_qrs_interval(int q_index, int s_index, int sampling_freq){
-    return (s_index - q_index) / sampling_freq;
+    return (s_index - q_index) / (float)sampling_freq;
 }
 
 float get_qrs_area(float qrs_interval, float r_amp){
@@ -123,7 +123,7 @@ vector<pvc_features> extract_pvc_features (const vector<float>& r_peak_indices,
         pvc_features bf;
         bf.pre_rr  = (r_peak_indices[i] - r_peak_indices[i - 1]) / (float)sampling_freq;
         bf.post_rr = (r_peak_indices[i + 1] - r_peak_indices[i]) / (float)sampling_freq;
-        bf.r_amp   = filtered_ecg_data[r_peak_indices[i]];
+        bf.r_amp   = filtered_ecg_data[r_index];
         bf.qrs_interval = get_qrs_interval(get_q_index(filtered_ecg_data, sampling_freq, 0.18, r_index),
                                         get_s_index(filtered_ecg_data, sampling_freq, 0.18, r_index),
                                         sampling_freq);
@@ -133,3 +133,4 @@ vector<pvc_features> extract_pvc_features (const vector<float>& r_peak_indices,
 
     return feature_vector;
 }
+

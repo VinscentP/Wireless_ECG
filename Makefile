@@ -11,7 +11,9 @@ SRCS = \
     signal_acquisition/ecg_get.cpp \
     signal_process/ecg_filters.cpp \
     signal_process/ecg_ht.cpp \
-	signal_export/ecg_export.cpp
+	signal_export/ecg_export.cpp \
+	feature_extraction/ecg_features.cpp \
+	signal_export/feature_export.cpp
 
 # Build rule: compile and link everything
 $(TARGET): $(SRCS)

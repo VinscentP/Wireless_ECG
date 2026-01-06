@@ -5,6 +5,8 @@
 #include "/Users/vincentpham/Desktop/Senior_Capstone/signal_process/ecg_filters.h"
 #include "/Users/vincentpham/Desktop/Senior_Capstone/signal_process/ecg_ht.h"
 #include "/Users/vincentpham/Desktop/Senior_Capstone/signal_export/ecg_export.h"
+#include "/Users/vincentpham/Desktop/Senior_Capstone/feature_extraction/ecg_features.h"
+#include "/Users/vincentpham/Desktop/Senior_Capstone/signal_export/feature_export.h"
 
 using namespace std;
 
@@ -33,6 +35,9 @@ int main(){
     vector<vector<float>> averaged_ecg_data(nsig);
     vector<vector<float>> segmentated_ecg_data(nsig);
     vector<vector<float>> r_indices(nsig);
+
+    vector<vector<pvc_features>> pvc_features_vector(nsig);
+    
     for (int i = 0; i < nsig; i++) {
         filtered_ecg_data[i] = bandpass_filter(phys_ecg_data[i], 5, 25, sampling_freq);
         differentiated_ecg_data[i] = ht_differentiation(filtered_ecg_data[i], sampling_freq);
@@ -40,6 +45,8 @@ int main(){
         averaged_ecg_data[i] = ht_moving_average(squared_ecg_data[i], 37);
         segmentated_ecg_data[i] = ht_adaptive_threshold(averaged_ecg_data[i], 0.9, sampling_freq);
         r_indices[i] = ht_peak_detection(segmentated_ecg_data[i], filtered_ecg_data[i], 15);
+        
+        pvc_features_vector[i] = extract_pvc_features(r_indices[i], filtered_ecg_data[i], sampling_freq);
     }
 
     
@@ -50,6 +57,6 @@ int main(){
     export_to_csv(averaged_ecg_data, nsig, "ecg_average.csv");
     export_to_csv(segmentated_ecg_data, nsig, "ecg_peak_threshold.csv");
     export_to_csv(r_indices, nsig, "r_indices.csv");
-
+    export_to_csv(pvc_features_vector, nsig, "pvc_features.csv");
     return 0;
 }
