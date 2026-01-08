@@ -1,0 +1,3 @@
+class MovingAverage {
+    private:
+};

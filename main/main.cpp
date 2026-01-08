@@ -10,7 +10,7 @@
 
 using namespace std;
 
-const int sampling_freq = 250;
+const int sampling_freq = 1024;
 
 int main(){
     setwfdb("/Users/vincentpham/Desktop/Senior_Capstone/data");
@@ -50,6 +50,7 @@ int main(){
     }
 
     
+    /*
     export_to_csv(phys_ecg_data, nsig, "ecg_phys.csv" );
     export_to_csv(filtered_ecg_data, nsig, "ecg_filtered.csv" );
     export_to_csv(differentiated_ecg_data, nsig, "ecg_differentiated.csv" );
@@ -58,5 +59,6 @@ int main(){
     export_to_csv(segmentated_ecg_data, nsig, "ecg_peak_threshold.csv");
     export_to_csv(r_indices, nsig, "r_indices.csv");
     export_to_csv(pvc_features_vector, nsig, "pvc_features.csv");
+    */
     return 0;
 }

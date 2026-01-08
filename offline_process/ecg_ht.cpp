@@ -32,15 +32,22 @@ vector<float> ht_moving_average(const vector<float>& squared_ecg, int window_siz
     float sum = 0.0;
     vector<float> averaged_ecg;
     
-    for(int j = 0; j < squared_ecg.size(); j++){
-        // If window is full, remove the oldest sample (sliding window)
-        if(j >= window_size){
-            sum -= squared_ecg[j - window_size];  // Remove sample falling out of window
-        }
-        
+    // Pad beginning with zeros until window is full to avoid edge effects
+    for(int j = 0; j < window_size - 1; j++){
+        averaged_ecg.push_back(0.0);
+    }
+    
+    // Initialize sum with first window_size samples
+    for(int j = 0; j < window_size; j++){
         sum += squared_ecg[j];
-        int actual_window = min(j + 1, window_size);
-        averaged_ecg.push_back(sum / actual_window);
+    }
+    averaged_ecg.push_back(sum / window_size);
+    
+    // Now slide the window
+    for(int j = window_size; j < squared_ecg.size(); j++){
+        sum -= squared_ecg[j - window_size];  // Remove oldest sample
+        sum += squared_ecg[j];                 // Add newest sample
+        averaged_ecg.push_back(sum / window_size);
     }
    
     return averaged_ecg;
@@ -51,12 +58,12 @@ vector<float> ht_adaptive_threshold(const vector<float>& averaged_ecg, float thr
     float SPKI, NPKI;
     float peak_threshold, noise_threshold;
     vector<float> approx_indices;
-    // Initialize
-    /*int init_segment_length = max(1, (int)(averaged_ecg.size() * 0.05));
-    float PEAKI = *max_element(averaged_ecg.begin(), averaged_ecg.begin() + init_segment_length);
-    */
+    
+    int minimum_samples = (int)(0.2 * sampling_rate);
+    int last_r_index = -minimum_samples;
 
-    int start_index = 70; // skip samples
+    // Skip initial samples to avoid edge effects (use ~0.2 seconds or minimum 100 samples)
+    int start_index = max(100, minimum_samples);
     int init_segment_length = max(1, (int)((averaged_ecg.size() - start_index) * 0.05));
     float PEAKI = *max_element(averaged_ecg.begin() + start_index, averaged_ecg.begin() + start_index + init_segment_length);
 
@@ -66,9 +73,7 @@ vector<float> ht_adaptive_threshold(const vector<float>& averaged_ecg, float thr
     peak_threshold = NPKI + threshold_factor * (SPKI - NPKI);
     noise_threshold = 0.5 * peak_threshold;
 
-    int minimum_samples = (int)(0.2 * sampling_rate);
-    int last_r_index = -minimum_samples;
-
+    
     for (int i = start_index; i < averaged_ecg.size() - 1; i++) { 
         float current_val = averaged_ecg[i];
 
