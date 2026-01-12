@@ -1,0 +1,3 @@
+class PeakDetection{
+    private:
+};
