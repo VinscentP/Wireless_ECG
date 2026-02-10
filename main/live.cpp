@@ -46,8 +46,8 @@ int main() {
         BandpassFilter bandpass_filter(5, 25, sampling_freq);
         SignalDifferentiator signal_differentiator(sampling_freq);
         //square signal by using the function signal_squaring
-        MovingAverage moving_average(0.1f * sampling_freq); // 37 = fs * duration of QRS
-        AdaptiveThreshold adaptive_threshold(sampling_freq, 0.01f);
+        MovingAverage moving_average(32); // 37 = fs * duration of QRS
+        AdaptiveThreshold adaptive_threshold(sampling_freq, 1e-6f);
         PeakDetector peak_detector(sampling_freq);
         for(int j = 0; j < phys_ecg_data[i].size(); j++){
             float filtered_sample = bandpass_filter.filterSample(phys_ecg_data[i][j]);
@@ -60,7 +60,6 @@ int main() {
             differentiated_ecg_data[i].push_back(differentiated_sample);
             squared_ecg_data[i].push_back(squared_sample);
             averaged_ecg_data[i].push_back(averaged_sample);
-            segmentated_ecg_data[i].push_back(averaged_sample);
             r_indices[i].push_back(r_index);
         }
     }
