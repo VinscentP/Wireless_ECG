@@ -1,32 +1,29 @@
-#include <vector>
+#pragma once
 
-using namespace std;
-
+template<int WINDOW_SIZE>
 class MovingAverage {
-    private:
-        vector<float> buffer;
-        float sum;
-        int window_size;
-        int count;
-        int index;
+private:
+    float buffer[WINDOW_SIZE];
+    float sum;
+    int   index;
+    int   count;
 
-        
-    public:
-        MovingAverage(float window_size) :
-         sum(0), index(0), count(0), 
-         buffer(window_size, 0),
-         window_size(window_size){}
+public:
+    MovingAverage() : sum(0.0f), index(0), count(0) {
+        for (int i = 0; i < WINDOW_SIZE; i++) buffer[i] = 0.0f;
+    }
 
-         float moving_average(float input){
-            sum -= buffer[index];
-            buffer[index] = input;
-            sum += input;
-            index = (index + 1) % window_size;
-        
-            if(count < window_size) count++;
-        
-            if(count < window_size) return sum / window_size; // use full window size for early samples
-            return sum / window_size;
-        }
-        
+    float moving_average(float input) {
+        sum -= buffer[index];
+        buffer[index] = input;
+        sum += input;
+        index = (index + 1) % WINDOW_SIZE;
+        if (count < WINDOW_SIZE) count++;
+        return sum / count;  // also fixed the early-sample bug — was dividing by WINDOW_SIZE before buffer filled
+    }
+
+    void reset() {
+        for (int i = 0; i < WINDOW_SIZE; i++) buffer[i] = 0.0f;
+        sum = 0.0f; index = 0; count = 0;
+    }
 };
