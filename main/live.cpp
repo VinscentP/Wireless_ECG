@@ -40,15 +40,13 @@ int main() {
     vector<vector<float>> r_indices(nsig);
     vector<vector<pvc_features>> pvc_features_vector(nsig);
 
-    
-
     for (int i = 0; i < nsig; i++) {
         BandpassFilter bandpass_filter(5, 25, sampling_freq);
         SignalDifferentiator signal_differentiator(sampling_freq);
-        //square signal by using the function signal_squaring
-        MovingAverage moving_average(32); // 37 = fs * duration of QRS
-        AdaptiveThreshold adaptive_threshold(sampling_freq, 1e-6f);
-        PeakDetector peak_detector(sampling_freq);
+        MovingAverage<32> moving_average;
+        AdaptiveThreshold adaptive_threshold(sampling_freq, 0.25);
+        PeakDetector<64>  peak_detector(sampling_freq);
+
         for(int j = 0; j < phys_ecg_data[i].size(); j++){
             float filtered_sample = bandpass_filter.filterSample(phys_ecg_data[i][j]);
             float differentiated_sample = signal_differentiator.differentiateSample(filtered_sample);
@@ -64,15 +62,12 @@ int main() {
         }
     }
 
-    // Export every pipeline stage to CSV for inspection
     export_to_csv(phys_ecg_data, nsig, "ecg_phys.csv");
     export_to_csv(filtered_ecg_data, nsig, "ecg_filtered.csv");
     export_to_csv(differentiated_ecg_data, nsig, "ecg_differentiated.csv");
     export_to_csv(squared_ecg_data, nsig, "ecg_squared.csv");
     export_to_csv(averaged_ecg_data, nsig, "ecg_averaged.csv");
-    //export_to_csv(segmentated_ecg_data, nsig, "ecg_segmentated.csv");  // approx R-peak indices from threshold
     export_to_csv(r_indices, nsig, "r_indices.csv");
-    //export_to_csv(pvc_features_vector, nsig, "pvc_features.csv");
 
     return 0;
 }
